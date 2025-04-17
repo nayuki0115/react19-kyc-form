@@ -148,7 +148,30 @@ uploadFileInfo
 | totalSteps | string[] | ✓ | 步驟名稱陣列，陣列長度即為步驟總數 |
 | onStepClick | function |  | 點擊步驟時的回調函式，參數為步驟編號 |
 
+## 畫面相關說明
+### UI
+![localhost_5173_ (9)](https://github.com/user-attachments/assets/c5cad722-ec94-4252-bddf-bf91368518a6)
+![osrnf-vu20e](https://github.com/user-attachments/assets/acd1d178-00a2-485e-963d-4cae0735730a)
 
+依序從中至下：  
+- 頁面標題
+- 步驟指示器
+  - 頁面長度不夠長時，StepIndicator（步驟指示器）會固定在上方，讓使用者方便選取
+- 表單區 （包含表單、按鈕）
+
+### 流程及驗證相關
+![localhost_5173_ (10)](https://github.com/user-attachments/assets/febf1ea5-bcc0-4bdf-8bfa-c791f6057b46)
+
+![localhost_5173_ (11)](https://github.com/user-attachments/assets/f0142273-4337-4a9b-9b7d-3e1ab3cd395b)
+
+- 三步驟，頁面分成三頁 
+  - Basic Information （首頁）
+  - Document Upload
+  - Confirmation Page
+- 驗證
+  -  紅色及外框提醒 
+  -  表單區之按鈕：Next 才會驗證、Back 不驗證 
+  -  步驟指示器不進行驗證，設想情境為想先回某步驟檢查資料
 
 ## 技術需求
 ### 必需技術
