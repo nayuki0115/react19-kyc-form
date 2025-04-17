@@ -34,7 +34,7 @@
 | children | any | ✓ | 被夾在 component 標籤之間的任何內容，可以是文字、html 等等 |
 | onClick | function |  | 按下按鈕要做的行為 |
 
-### DatePicker
+#### DatePicker
 ![image](https://github.com/user-attachments/assets/31bfae9e-e209-45ef-ae60-0a393fe5fc78)  
 - 日期選擇器
   
@@ -50,7 +50,7 @@
 | validationRules | function[] |  | 驗證規則陣列，每個函式接收日期字串並返回錯誤訊息或 undefined |
 | onValidationResult | function |  | 驗證結果回調函式，參數包含驗證是否通過及可選的錯誤訊息 |
 
-### FileUpload
+#### FileUpload
 ![image](https://github.com/user-attachments/assets/515389ef-e142-4507-adf6-10c62a234541)  
 - 單選的檔案上傳器
 - 選擇檔案之後會顯示已選檔案
@@ -76,7 +76,7 @@ uploadFileInfo
 | size | number | ✓ | 檔案大小（單位：bytes） |
 | type | string | ✓ | 檔案的 MIME 類型 |
 
-### MultiFileUpload
+#### MultiFileUpload
 ![image](https://github.com/user-attachments/assets/75462060-a40c-4489-afd6-86d7dac616eb)  
 - 複選的檔案上傳器
 - 選擇檔案之後會顯示已選檔案
@@ -102,7 +102,7 @@ uploadFileInfo
 | size | number | ✓ | 檔案大小（單位：bytes） |
 | type | string | ✓ | 檔案的 MIME 類型 |
 
-### Input
+#### Input
 ![image](https://github.com/user-attachments/assets/2f56e71a-b5e9-4ed4-9f88-760549cd3ad2)  
 - 輸入框
 
@@ -117,7 +117,7 @@ uploadFileInfo
 | errorMessage | string |  | 顯示的錯誤訊息 |
 | onChange | function |  | 輸入框值改變時的回調函式 |
 
-### Select
+#### Select
 ![image](https://github.com/user-attachments/assets/c8b75bcd-bf7a-49d9-a4bf-b34fab92ed98)
 - 下拉選單
 
@@ -133,7 +133,7 @@ uploadFileInfo
 | errorMessage | string |  | 顯示的錯誤訊息 |
 | onChangeValidation | function |  | 選項改變時的驗證回調函式，參數包含驗證是否通過及可選的錯誤訊息 |
 
-### StepIndicator
+#### StepIndicator
 ![image](https://github.com/user-attachments/assets/07ba9f11-51bd-43c6-8e41-e5c5a733eef1)
 ![image](https://github.com/user-attachments/assets/41225b96-dc80-4379-a234-688d54ae6a67)
 - 步驟指示器
