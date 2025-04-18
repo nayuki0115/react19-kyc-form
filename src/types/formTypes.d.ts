@@ -38,7 +38,7 @@ interface datePickerProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   name: string;
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (evnet: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   errorMessage?: string;
   validationRules?: ((dateString: string) => string | undefined)[]; // 接收驗證規則

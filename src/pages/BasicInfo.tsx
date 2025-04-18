@@ -168,7 +168,7 @@ const BasicInfo = () => {
         <Input label="Phone" id="phone" name="phone" type="tel" required value={formData.phone} onChange={handleInputChange} onBlur={handleInputBlur} errorMessage={errors.phone} />
         <Select label="Nationality" id="nationality" name="nationality" required options={nationalityOptions} value={formData.nationality} onChange={handleSelectChange} errorMessage={errors.nationality} />
         <Select label="Gender" id="gender" name="gender" options={genderOptions} value={formData.gender} onChange={handleSelectChange} />
-        <Input label="Address" id="address" name="address" type="text" value={formData.address} onChange={handleInputChange} />
+        <Input label="Address" id="address" name="address" type="text" value={formData.address!} onChange={handleInputChange} />
         <DatePicker
           label="Date of Birth"
           id="dob"

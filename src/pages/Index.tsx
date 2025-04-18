@@ -3,18 +3,17 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const totalSteps = ['Basic Information', 'Document Upload', 'Confirmation']
   const totalStepsPath = ['/', '/document-upload', '/confirmation']
   const handleCurrentStep = () => {
-    const location = useLocation();
     const pathName = location.pathname
     let flag = totalStepsPath.indexOf(pathName) !== -1 ? Number(totalStepsPath.indexOf(pathName))+1 : 1
     return flag
   }
   const handleStepClick = (index: number) => {
-    console.log('index', index)
     const tempIndex = Number(index) - 1
-    console.log(totalStepsPath[tempIndex])
     navigate(`${totalStepsPath[tempIndex]}`)
   }
   return (
