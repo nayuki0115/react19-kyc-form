@@ -48,7 +48,7 @@ interface datePickerProps extends React.InputHTMLAttributes<HTMLInputElement> {
 interface stepIndicatorProps {
   currentStep: number;
   totalSteps: string[];
-  onStepClick?: (step: number) => React.MouseEventHandler<HTMLDivElement>;
+  onStepClick?: (step: number) => void;
 }
 
 interface fileUploadProps {

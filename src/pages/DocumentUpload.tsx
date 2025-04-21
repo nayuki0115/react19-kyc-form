@@ -42,7 +42,7 @@ const DocumentUpload = () => {
   const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
 
 
-  const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, previewRef: React.RefObject<HTMLImageElement>, type: string) => {
+  const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, previewRef: React.RefObject<HTMLImageElement | null>, type: string) => {
     if (file) {
       const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'application/pdf'];
       const allowedTypesText = ".jpg,.png,.pdf"

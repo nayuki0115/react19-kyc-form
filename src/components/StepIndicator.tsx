@@ -1,6 +1,4 @@
 const  StepIndicator = ({currentStep, totalSteps, onStepClick}: stepIndicatorProps) => {
-  const numberOfSteps = totalSteps.length
-
   const getStepClassName = (index: number): string => {
     const baseClassName = 'step';
     const completedClassName = index + 1 < currentStep ? 'completed' : '';
@@ -15,7 +13,6 @@ const  StepIndicator = ({currentStep, totalSteps, onStepClick}: stepIndicatorPro
     }
   }
 
-
   return (
     <section className="step-indicator">
       {
@@ -28,20 +25,6 @@ const  StepIndicator = ({currentStep, totalSteps, onStepClick}: stepIndicatorPro
             )
         })
       }
-      
-
-      {/* <div className="step">
-        <div className="step-icon">1</div>
-        <p>Basic Information</p>
-      </div>
-      <div className="step">
-        <div className="step-icon">2</div>
-        <p>Document Upload</p>
-      </div>
-      <div className="step">
-        <div className="step-icon">3</div>
-        <p>Confirmation</p>
-      </div> */}
     </section>
   )
 }
