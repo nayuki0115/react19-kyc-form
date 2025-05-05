@@ -8,7 +8,7 @@ const Input = ({ label, id, name, required, errorMessage, value, onChange, ...re
         <input id={id} name={name} value={value} onChange={onChange} required={required} className={`${errorMessage ? 'error-element' : ''}`} {...rest} />
       </div>
 
-      {errorMessage ? <p className="error-message">{errorMessage}</p> : ''}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>
   )
 }

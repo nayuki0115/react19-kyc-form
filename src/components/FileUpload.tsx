@@ -109,7 +109,7 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
         </div>
         : ''}
       {error ? <p className="error-message">{error}</p> : ''}
-      {errorMessage ? <p className="error-message">{errorMessage}</p> : ''}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>
   );
 };

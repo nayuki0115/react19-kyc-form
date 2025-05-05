@@ -16,7 +16,7 @@ const Select = ({ label, id, name, value, onChange, required, errorMessage, opti
         </select>
       </div>
 
-      {errorMessage ? <p className="error-message">{errorMessage}</p> : ''}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>
   );
 };
