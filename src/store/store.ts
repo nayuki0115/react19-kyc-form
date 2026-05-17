@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import basicInfoReducer from '@/store/basicInfoSlice';
-import documentUploadReducer  from '@/store/documentUploadSlice.ts'
+import documentUploadReducer  from '@/store/documentUploadSlice'
 
 
 const store = configureStore({

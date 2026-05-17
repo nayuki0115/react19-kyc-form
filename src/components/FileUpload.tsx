@@ -6,6 +6,7 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,6 +54,19 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
     return type.startsWith('image/');
   };
 
+  // manage preview URL lifecycle
+  useEffect(() => {
+    if (selectedFile && isPreviewable(selectedFile.type)) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+        setPreviewUrl(null);
+      };
+    }
+    return () => {};
+  }, [selectedFile]);
+
   const handleDeleteFile = () => {
     setSelectedFile(null);
     onFileChange(null)
@@ -82,9 +96,9 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
           <ul>
             <li className="selected-files-item">
               <span className="selected-file-name">{selectedFile.name} ({formatFileSize(selectedFile.size)})</span>
-              {preview && isPreviewable(selectedFile.type) && (
+              {preview && selectedFile && isPreviewable(selectedFile.type) && previewUrl && (
                 <div className="file-preview">
-                  <img src={URL.createObjectURL(selectedFile)} alt={selectedFile.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                  <img src={previewUrl} alt={selectedFile.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 </div>
               )}
               <Button type="button" className="delete-button" variant="secondary" onClick={handleDeleteFile}> X </Button>
@@ -92,22 +106,17 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
           </ul>
         </div>
       )}
-      {fileInfo ?
+      {fileInfo && !selectedFile && (
         <div className="selected-files">
           <label className="selected-files-label">Selected Files:</label>
           <ul>
             <li className="selected-files-item">
               <span className="selected-file-name">{fileInfo.name} ({formatFileSize(fileInfo.size)})</span>
-              {preview && isPreviewable(fileInfo.type) && (
-                <div className="file-preview">
-                  <img alt={fileInfo.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
-                </div>
-              )}
               <Button type="button" className="delete-button" variant="secondary" onClick={handleDeleteFile}> X </Button>
             </li>
           </ul>
         </div>
-        : ''}
+      )}
       {error ? <p className="error-message">{error}</p> : ''}
       {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>

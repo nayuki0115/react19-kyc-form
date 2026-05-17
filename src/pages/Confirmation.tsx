@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from '@/store/store'
 import { useDispatch, useSelector } from "react-redux";
 import { setBasicInfoData } from '@/store/basicInfoSlice'; // 確保路徑正確
-import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice.ts";
+import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice";
 
 import Alert from '@/components/Alert';
 import { useState } from "react";

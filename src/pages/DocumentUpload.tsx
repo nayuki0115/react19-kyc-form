@@ -1,8 +1,8 @@
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RootState, AppDispatch } from '@/store/store'
+import { RootState } from '@/store/store'
 import { useDispatch, useSelector } from "react-redux";
-import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice.ts";
+import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice";
 
 import FileUpload from "@/components/FileUpload";
 import MultiFileUpload from "@/components/MultiFileUpload";
@@ -14,54 +14,35 @@ const DocumentUpload = () => {
 
   const documentUpload = useSelector((state: RootState) => state.documentUpload);
 
-  useEffect(() => {
-    if (documentUpload.idFrontFile) {
-      setIdFrontFile(new File([], documentUpload.idFrontFile.name, { type: documentUpload.idFrontFile.type }));
-    } else {
-      setIdFrontFile(null);
-    }
-
-    if (documentUpload.idBackFile) {
-      setIdBackFile(new File([], documentUpload.idBackFile.name, { type: documentUpload.idBackFile.type }));
-    } else {
-      setIdBackFile(null);
-    }
-
-    if (documentUpload.additionalFiles) {
-      setAdditionalDocuments(documentUpload.additionalFiles.map(info => new File([], info.name, { type: info.type })));
-    } else {
-      setAdditionalDocuments([]);
-    }
-  }, [documentUpload]);
+  // Keep files in local component state for preview and manipulation.
+  // Redux stores only serializable metadata (name/size/type) and is updated on Next/Back.
 
 
   const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
-  const idFrontPreviewRef = useRef<HTMLImageElement>(null);
   const [idBackFile, setIdBackFile] = useState<File | null>(null);
-  const idBackPreviewRef = useRef<HTMLImageElement>(null);
   const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
 
 
-  const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, previewRef: React.RefObject<HTMLImageElement | null>, type: string) => {
+  const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, type: string) => {
     if (file) {
       const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'application/pdf'];
-      const allowedTypesText = ".jpg,.png,.pdf"
+      const allowedTypesText = ".jpg,.png,.pdf";
 
       if (allowedTypes.includes(file.type)) {
         setFile(file);
-        displayPreview(file, idFrontPreviewRef.current);
       } else {
-        setVisalbe(true)
-        setMessage(`File type not allowed. Please select ${allowedTypesText} file.`)
+        setVisalbe(true);
+        setMessage(`File type not allowed. Please select ${allowedTypesText} file.`);
         setFile(null);
       }
     } else {
+      // clearing local file selection; metadata will be cleared on Back/Next as needed
+      setFile(null);
       if (type === 'front') {
         dispatch(setIdFrontFileInfo(null));
       } else if (type === 'back') {
         dispatch(setIdBackFileInfo(null));
       }
-      setFile(null);
     }
   };
 
@@ -69,17 +50,7 @@ const DocumentUpload = () => {
     setAdditionalDocuments(files);
   };
 
-  const displayPreview = (file: File, previewElement: HTMLDivElement | null) => {
-    if (previewElement && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        previewElement.innerHTML = `<img src="${reader.result}" alt="${file.name}" style="max-width: 200px; max-height: 200px;" />`;
-      };
-      reader.readAsDataURL(file);
-    } else if (previewElement) {
-      previewElement.textContent = `Selected: ${file.name}`;
-    }
-  };
+  // Preview handled inside FileUpload / MultiFileUpload components.
 
   const [visable, setVisalbe] = useState<boolean>(false)
   const [mode, setMode] = useState<'warning' | 'info' | 'success' | 'danger'>('warning')
@@ -92,10 +63,16 @@ const DocumentUpload = () => {
   const [errors, setErrors] = useState<Errors>({});
 
 
+  const hasFrontFile = !!idFrontFile || !!documentUpload.idFrontFile;
+  const hasBackFile = !!idBackFile || !!documentUpload.idBackFile;
+  const frontFileInfo = idFrontFile ? { name: idFrontFile.name, size: idFrontFile.size, type: idFrontFile.type } : documentUpload.idFrontFile;
+  const backFileInfo = idBackFile ? { name: idBackFile.name, size: idBackFile.size, type: idBackFile.type } : documentUpload.idBackFile;
+  const additionalFilesInfo = additionalDocuments.length > 0 ? additionalDocuments.map(file => ({ name: file.name, size: file.size, type: file.type })) : documentUpload.additionalFiles;
+
   const handleBack = () => {
-    dispatch(setIdFrontFileInfo(idFrontFile ? { name: idFrontFile.name, size: idFrontFile.size, type: idFrontFile.type } : null));
-    dispatch(setIdBackFileInfo(idBackFile ? { name: idBackFile.name, size: idBackFile.size, type: idBackFile.type } : null));
-    dispatch(setAdditionalFilesInfo(additionalDocuments.map(file => ({ name: file.name, size: file.size, type: file.type }))));
+    dispatch(setIdFrontFileInfo(frontFileInfo));
+    dispatch(setIdBackFileInfo(backFileInfo));
+    dispatch(setAdditionalFilesInfo(additionalFilesInfo));
 
     navigate('/');
   };
@@ -104,12 +81,12 @@ const DocumentUpload = () => {
     const newErrors: Errors = {};
     let hasErrorsFlag = false;
 
-    if (!idFrontFile) {
+    if (!hasFrontFile) {
       newErrors.idFront = "ID Card Front is required";
       hasErrorsFlag = true;
     }
 
-    if (!idBackFile) {
+    if (!hasBackFile) {
       newErrors.idBack = "ID Card Back is required";
       hasErrorsFlag = true;
     }
@@ -123,9 +100,9 @@ const DocumentUpload = () => {
       return;
     }
 
-    dispatch(setIdFrontFileInfo(idFrontFile ? { name: idFrontFile.name, size: idFrontFile.size, type: idFrontFile.type } : null));
-    dispatch(setIdBackFileInfo(idBackFile ? { name: idBackFile.name, size: idBackFile.size, type: idBackFile.type } : null));
-    dispatch(setAdditionalFilesInfo(additionalDocuments.map(file => ({ name: file.name, size: file.size, type: file.type }))));
+    dispatch(setIdFrontFileInfo(frontFileInfo));
+    dispatch(setIdBackFileInfo(backFileInfo));
+    dispatch(setAdditionalFilesInfo(additionalFilesInfo));
 
     navigate('/confirmation');
   };
@@ -143,7 +120,7 @@ const DocumentUpload = () => {
           accept="image/jpeg, image/png	,application/pdf"
           acceptText=".jpg,.png,.pdf"
           maxSizeMB={2}
-          onFileChange={(file) => handleFileChange(file, setIdFrontFile, idFrontPreviewRef, 'front')}
+          onFileChange={(file) => handleFileChange(file, setIdFrontFile, 'front')}
           preview={true}
           required={true}
           errorMessage={errors.idFront}
@@ -156,7 +133,7 @@ const DocumentUpload = () => {
           accept="image/jpeg, image/png	,application/pdf"
           acceptText=".jpg,.png,.pdf"
           maxSizeMB={2}
-          onFileChange={(file) => handleFileChange(file, setIdBackFile, idBackPreviewRef, 'back')}
+          onFileChange={(file) => handleFileChange(file, setIdBackFile, 'back')}
           preview={true}
           required={true}
           errorMessage={errors.idBack}

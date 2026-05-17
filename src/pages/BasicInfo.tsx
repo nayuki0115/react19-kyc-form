@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { setBasicInfoData } from '@/store/basicInfoSlice'; // 確保路徑正確
-import { RootState, AppDispatch } from '@/store/store'; // 導入 RootState 和 AppDispatch 类型
+import { setBasicInfoData } from '@/store/basicInfoSlice';
+import { RootState, AppDispatch } from '@/store/store'; 
 import { useDispatch, useSelector } from 'react-redux';
 
 import Input from '@/components/Input';
+
 import Button from '@/components/Button';
 import Select from '@/components/Select';
 import DatePicker from '@/components/DatePicker';
 import Alert from '@/components/Alert';
+
+
+
+
 
 const BasicInfo = () => {
   const navigate = useNavigate();
@@ -60,23 +65,24 @@ const BasicInfo = () => {
   };
 
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
-  };
+  
+  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   setFormData((prevData) => ({ ...prevData, [name]: value }));
+  //   setErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
+  // };
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  // const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const { name, value } = event.target;
+  //   setFormData((prevData) => ({ ...prevData, [name]: value }));
 
-    const label = name.charAt(0).toUpperCase() + name.slice(1);
-    let errorMessage: string | undefined;
-    if (event.target.required) {
-      errorMessage = validateRequired(value, label);
-    }
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
-  };
+  //   const label = name.charAt(0).toUpperCase() + name.slice(1);
+  //   let errorMessage: string | undefined;
+  //   if (event.target.required) {
+  //     errorMessage = validateRequired(value, label);
+  //   }
+  //   setErrors((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
+  // };
 
 
   const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -98,50 +104,56 @@ const BasicInfo = () => {
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setFormData((prevData) => ({ ...prevData, dob: value }));
-    const ageError = validateAge(value);
-    setErrors((prevErrors) => ({ ...prevErrors, dob: ageError }));
+  };
+
+  
+  const nameRef = useRef<validaHandle>(null);
+  const emailRef = useRef<validaHandle>(null);
+  const phoneRef = useRef<validaHandle>(null);
+  const dobRef = useRef<validaHandle>(null);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  }
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    console.log(`Select ${name} changed to: ${value}`);
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleNext = () => {
-    const newErrors: Errors = {};
-    let hasErrorsFlag = false;
+    let errors: boolean[] = [];
+    const requiredColumns: React.RefObject<validaHandle | null>[] = [nameRef, emailRef, phoneRef, dobRef]
 
-    for (const key in formData) {
-      const value = formData[key];
-      let errorMessage: string | undefined;
-      const label = key.charAt(0).toUpperCase() + key.slice(1);
-
-      switch (key) {
-        case 'name':
-        case 'phone':
-          errorMessage = validateRequired(value, label);
-          break;
-        case 'email':
-          errorMessage = validateRequired(value, label) || validateEmail(value);
-          break;
-        case 'dob':
-          errorMessage = validateRequired(value, 'Date of Birth') || validateAge(value);
-          break;
-        default:
-          break;
+    requiredColumns.forEach(ref => {
+      if (ref.current && typeof ref.current.validation === 'function') {
+        const isValid = ref.current.validation();
+        if (!isValid) {
+          errors.push(false);
+        }
       }
+    });
 
-      if (errorMessage) {
-        newErrors[key] = errorMessage;
-        hasErrorsFlag = true;
-        setVisalbe(true)
-        setMessage('Please enter the required fields')
-      }
 
-    };
-
-    setErrors(newErrors);
-
-    if (!hasErrorsFlag) {
-      dispatch(setBasicInfoData(formData))
+    let alertFlag = errors.some(item => item === false)
+    if(alertFlag) {
+      setVisalbe(true)
+      setMessage('Please enter the required fields')
+    }else {
+      setVisalbe(false);
+      setMessage('');
+      // validation passed -> save to redux and go to next step
+      dispatch(setBasicInfoData(formData));
       navigate('/document-upload');
     }
+
+    // if (!hasErrorsFlag) {
+    //   dispatch(setBasicInfoData(formData))
+    //   navigate('/document-upload');
+    // }
   }
+
 
   const nationalityOptions = [
     { value: 'TW', label: 'Taiwan' },
@@ -163,11 +175,14 @@ const BasicInfo = () => {
       <Alert visable={visable} mode={mode} message={message} onClose={handleAlertClose} />
       <h2>Basic Information</h2>
       <fieldset>
-        <Input label="Name" id="name" name="name" type="text" required value={formData.name} onChange={handleInputChange} onBlur={handleInputBlur} errorMessage={errors.name} />
-        <Input label="Email" id="email" name="email" type="email" required value={formData.email} onChange={handleInputChange} onBlur={handleInputBlur} errorMessage={errors.email} />
-        <Input label="Phone" id="phone" name="phone" type="tel" required value={formData.phone} onChange={handleInputChange} onBlur={handleInputBlur} errorMessage={errors.phone} />
-        <Select label="Nationality" id="nationality" name="nationality" required options={nationalityOptions} value={formData.nationality} onChange={handleSelectChange} errorMessage={errors.nationality} />
-        <Select label="Gender" id="gender" name="gender" options={genderOptions} value={formData.gender} onChange={handleSelectChange} />
+        <Input label='Name' id='name' type='text' name='name' required value={formData.name} onChange={handleInputChange} ref={nameRef} />
+        <Input label='Email' id='email' type='email' name='email' required value={formData.email} onChange={handleInputChange} ref={emailRef} />
+        <Input label="Phone" id="phone" name="phone" type="tel" required value={formData.phone} onChange={handleInputChange} ref={phoneRef} />
+        <Select label="Nationality" id="nationality" name="nationality" required options={nationalityOptions} value={formData.nationality} onChange={handleSelectChange} /> 
+
+      
+        {/* <Select label="Nationality" id="nationality" name="nationality" required options={nationalityOptions} value={formData.nationality} onChange={handleSelectChange} errorMessage={errors.nationality} /> */}
+        {/* <Select label="Gender" id="gender" name="gender" options={genderOptions} value={formData.gender} onChange={handleSelectChange} /> */}
         <Input label="Address" id="address" name="address" type="text" value={formData.address!} onChange={handleInputChange} />
         <DatePicker
           label="Date of Birth"
@@ -177,6 +192,13 @@ const BasicInfo = () => {
           value={formData.dob}
           onChange={handleDateChange}
           errorMessage={errors.dob}
+          validationRules={[
+            (v: string) => validateRequired(v, 'Date of Birth') || validateAge(v)
+          ]}
+          onValidationResult={(isValid: boolean, message?: string) => {
+            setErrors((prev) => ({ ...prev, dob: isValid ? undefined : message }));
+          }}
+          ref={dobRef}
         />
       </fieldset>
       <div className="form-actions">

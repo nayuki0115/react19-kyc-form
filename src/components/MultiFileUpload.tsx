@@ -5,6 +5,7 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
     if (filesInfo) {
@@ -13,6 +14,18 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
       setSelectedFiles([]);
     }
   }, [filesInfo]);
+
+  // manage object URLs for previews for selected local files (not metadata-only files)
+  useEffect(() => {
+    // revoke previous urls
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    const urls = selectedFiles.map(file => (file && file.type.startsWith('image/') ? URL.createObjectURL(file) : ''));
+    setPreviewUrls(urls);
+    return () => {
+      urls.forEach(url => { if (url) URL.revokeObjectURL(url); });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFiles]);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -104,9 +117,9 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
                 <span className="selected-file-name">
                   {file.name} ({formatFileSize(file.size)})
                 </span>
-                {preview && isPreviewable(file.type) && (
+                {preview && isPreviewable(file.type) && previewUrls[index] && (
                   <div className="file-preview">
-                    <img src={URL.createObjectURL(file)} alt={file.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                    <img src={previewUrls[index]} alt={file.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
                   </div>
                 )}
                 <Button
