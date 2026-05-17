@@ -18,7 +18,7 @@
   
 | 變數名稱 | 型別 | 必填 | 描述 |
 |:------:|:------:|:-----:| ----- |
-| visable | boolean | ✓ | Alert 顯示與否 |
+| visible | boolean | ✓ | Alert 顯示與否 |
 | mode | string | ✓ | 提供四種樣式： `warning` 、 `info` 、 `success` 、 `danger` |
 | message | string | ✓ | 要顯示的訊息 |
 | onClose | function |  | 右方的關閉鈕有提供 method 可依照需求放入關閉前的行為，例如：關閉前需打 API |

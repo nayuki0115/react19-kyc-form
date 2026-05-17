@@ -1,4 +1,4 @@
-const Alert = ({ visable, mode, message, onClose, ...rest }: AlertType) => {
+const Alert = ({ visible, mode, message, onClose, ...rest }: AlertType) => {
   const alertMode = mode.toUpperCase();
   const alertClass = `alert alert-${mode}`;
   const handleClose = () => {
@@ -9,7 +9,7 @@ const Alert = ({ visable, mode, message, onClose, ...rest }: AlertType) => {
 
   return (
     <>
-      {visable ?
+      {visible ?
         <div className={alertClass}>
           {message}
           { onClose ?  <button onClick={handleClose} className="close-button">×</button> : ''}

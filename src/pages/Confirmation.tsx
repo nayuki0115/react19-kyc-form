@@ -27,11 +27,11 @@ const Confirmation = () => {
     navigate('/document-upload');
   }
 
-  const [visable, setVisalbe] = useState<boolean>(false)
+  const [visible, setVisible] = useState<boolean>(false)
   const [mode, setMode] = useState<'warning' | 'info' | 'success' | 'danger'>('success')
   const [message, setMessage] = useState<string>('')
   const handleAlertClose = () => {
-    setVisalbe(false)
+    setVisible(false)
     setMessage('')
   };
 
@@ -56,7 +56,7 @@ const Confirmation = () => {
 
   return (
     <section id="step3" className="form-step">
-      <Alert visable={visable} mode={mode} message={message} onClose={handleAlertClose} />
+      <Alert visible={visible} mode={mode} message={message} onClose={handleAlertClose} />
       <h2>Confirmation Page</h2>
       <fieldset>
         <div className="preview-section">
