@@ -102,7 +102,7 @@ interface formDataType {
 }
 
 interface AlertType {
-  visable: boolean;
+  visible: boolean;
   mode: 'warning' | 'info' | 'success' | 'danger';
   message: string;
   onClose?: () => void

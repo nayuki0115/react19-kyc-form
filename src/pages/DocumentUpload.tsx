@@ -52,11 +52,11 @@ const DocumentUpload = () => {
 
   // Preview handled inside FileUpload / MultiFileUpload components.
 
-  const [visable, setVisalbe] = useState<boolean>(false)
+  const [visible, setVisible] = useState<boolean>(false)
   const [mode, setMode] = useState<'warning' | 'info' | 'success' | 'danger'>('warning')
   const [message, setMessage] = useState<string>('')
   const handleAlertClose = () => {
-    setVisalbe(false)
+    setVisible(false)
     setMessage('')
   };
 
@@ -110,7 +110,7 @@ const DocumentUpload = () => {
 
   return (
     <section id="step2" className="form-step">
-      <Alert visable={visable} mode={mode} message={message} onClose={handleAlertClose} />
+      <Alert visible={visible} mode={mode} message={message} onClose={handleAlertClose} />
       <h2>Document Upload</h2>
       <fieldset>
         <FileUpload

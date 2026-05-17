@@ -22,11 +22,11 @@ const BasicInfo = () => {
 
   const [formData, setFormData] = useState<formDataType>(basicInfo);
 
-  const [visable, setVisalbe] = useState<boolean>(false)
+  const [visible, setVisible] = useState<boolean>(false)
   const [mode, setMode] = useState<'warning' | 'info' | 'success' | 'danger'>('warning')
   const [message, setMessage] = useState<string>('')
   const handleAlertClose = () => {
-    setVisalbe(false)
+    setVisible(false)
     setMessage('')
   }
 
@@ -172,7 +172,7 @@ const BasicInfo = () => {
 
   return (
     <section id="step1">
-      <Alert visable={visable} mode={mode} message={message} onClose={handleAlertClose} />
+      <Alert visible={visible} mode={mode} message={message} onClose={handleAlertClose} />
       <h2>Basic Information</h2>
       <fieldset>
         <Input label='Name' id='name' type='text' name='name' required value={formData.name} onChange={handleInputChange} ref={nameRef} />
