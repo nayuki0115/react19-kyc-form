@@ -1,7 +1,11 @@
-import { useState } from "react";
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 
-const DatePicker = ({ label, id, name, required, value, onChange, errorMessage, validationRules = [], onValidationResult, ...rest }: datePickerProps) => {
+const DatePicker = forwardRef<validaHandle, datePickerProps>(({ label, id, name, required, value, onChange, errorMessage, validationRules = [], onValidationResult, ...rest }: datePickerProps, forwardedRef) => {
   const [localErrorMessage, setLocalErrorMessage] = useState<string | undefined>(errorMessage);
+
+  useEffect(() => {
+    setLocalErrorMessage(errorMessage);
+  }, [errorMessage]);
 
   const validate = (dateString: string) => {
     for (const rule of validationRules) {
@@ -14,18 +18,27 @@ const DatePicker = ({ label, id, name, required, value, onChange, errorMessage, 
         return false;
       }
     }
-    setLocalErrorMessage(errorMessage);
+    setLocalErrorMessage(undefined);
     if (onValidationResult) {
       onValidationResult(true);
     }
     return true;
   };
 
+  useImperativeHandle(forwardedRef, () => ({
+    validation: () => validate(value || ''),
+  }));
+
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (onChange) {
       onChange(event);
     }
+    validate(value);
+  };
+
+  const handleDateBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const { value } = event.target;
     validate(value);
   };
 
@@ -43,7 +56,8 @@ const DatePicker = ({ label, id, name, required, value, onChange, errorMessage, 
           required={required}
           value={value}
           onChange={handleDateChange}
-          className={`${errorMessage ? 'error-element' : ''}`}
+          onBlur={handleDateBlur}
+          className={`${localErrorMessage ? 'error-element' : ''}`}
           {...rest}
         />
       </div>
@@ -52,6 +66,6 @@ const DatePicker = ({ label, id, name, required, value, onChange, errorMessage, 
     </div>
   );
 
-}
+});
 
 export default DatePicker;

@@ -4,9 +4,11 @@ interface inputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   value: string;
   required?: boolean;
-  onBlurValidation?: (isValid: boolean, message?: string) => void;
-  errorMessage?: string;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+}
+
+interface validaHandle {
+  validation: () => boolean;
 }
 
 interface buttonProps {
@@ -21,17 +23,27 @@ interface selectOption {
   value: string;
   label: string;
 }
+
 interface selectProps extends React.InputHTMLAttributes<HTMLSelectElement> {
   label: string;
   id: string;
   name: string;
-  value?: string;
-  onChange?: React.ChangeEventHandler<HTMLSelectElement>;
+  value: string;
   required?: boolean;
-  errorMessage?: string;
   options: selectOption[];
-  onChangeValidation?: (isValid: boolean, message?: string) => void;
+  onChange?: React.ChangeEventHandler<HTMLSelectElement>;
 }
+// interface selectProps extends React.InputHTMLAttributes<HTMLSelectElement> {
+//   label: string;
+//   id: string;
+//   name: string;
+//   value?: string;
+//   onChange?: React.ChangeEventHandler<HTMLSelectElement>;
+//   required?: boolean;
+//   errorMessage?: string;
+//   options: selectOption[];
+//   onChangeValidation?: (isValid: boolean, message?: string) => void;
+// }
 
 interface datePickerProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
