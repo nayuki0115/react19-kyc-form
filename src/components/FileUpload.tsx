@@ -2,14 +2,12 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/Button";
 import { validateUploadFile } from "@/utils/fileValidation";
 
-const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage, fileInfo }: fileUploadProps) => {
+const FileUpload = ({ label, id, name, file, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage }: fileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const clearSelectedFile = () => {
-    setSelectedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -37,7 +35,6 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
       return;
     }
 
-    setSelectedFile(file);
     setError(null);
     onFileChange(file);
   };
@@ -60,8 +57,8 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
 
   // manage preview URL lifecycle
   useEffect(() => {
-    if (selectedFile && isPreviewable(selectedFile.type)) {
-      const url = URL.createObjectURL(selectedFile);
+    if (file && isPreviewable(file.type)) {
+      const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       return () => {
         URL.revokeObjectURL(url);
@@ -69,7 +66,7 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
       };
     }
     return () => {};
-  }, [selectedFile]);
+  }, [file]);
 
   const handleDeleteFile = () => {
     setError(null);
@@ -94,28 +91,17 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
         style={{ display: 'none' }} // 隱藏預設的 input
         onChange={handleFileSelect} // 監聽預設輸入框的 change 事件
       />
-      {selectedFile && (
+      {file && (
         <div className="selected-files">
           <label className="selected-files-label">Selected Files:</label>
           <ul>
             <li className="selected-files-item">
-              <span className="selected-file-name">{selectedFile.name} ({formatFileSize(selectedFile.size)})</span>
-              {preview && selectedFile && isPreviewable(selectedFile.type) && previewUrl && (
+              <span className="selected-file-name">{file.name} ({formatFileSize(file.size)})</span>
+              {preview && isPreviewable(file.type) && previewUrl && (
                 <div className="file-preview">
-                  <img src={previewUrl} alt={selectedFile.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                  <img src={previewUrl} alt={file.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 </div>
               )}
-              <Button type="button" className="delete-button" variant="secondary" onClick={handleDeleteFile}> X </Button>
-            </li>
-          </ul>
-        </div>
-      )}
-      {fileInfo && !selectedFile && (
-        <div className="selected-files">
-          <label className="selected-files-label">Selected Files:</label>
-          <ul>
-            <li className="selected-files-item">
-              <span className="selected-file-name">{fileInfo.name} ({formatFileSize(fileInfo.size)})</span>
               <Button type="button" className="delete-button" variant="secondary" onClick={handleDeleteFile}> X </Button>
             </li>
           </ul>

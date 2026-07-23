@@ -2,18 +2,22 @@ import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from '@/store/store'
 import { useDispatch, useSelector } from "react-redux";
 import { setBasicInfoData } from '@/store/basicInfoSlice'; // 確保路徑正確
-import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice";
 
 import Alert from '@/components/Alert';
+import useDocumentFiles from "@/hooks/useDocumentFiles";
 import { useState } from "react";
 
 const Confirmation = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const basicInfo = useSelector((state: RootState) => state.basicInfo);
-  const documentUpload = useSelector((state: RootState) => state.documentUpload);
-  console.log('documentUpload', documentUpload)
+  const {
+    idFrontFile,
+    idBackFile,
+    additionalFiles,
+    clearDocumentFiles,
+  } = useDocumentFiles();
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -36,6 +40,35 @@ const Confirmation = () => {
   };
 
   const handleSubmit = () => {
+    if (!idFrontFile || !idBackFile) {
+      setMode('warning');
+      setVisible(true);
+      setMessage('Please upload the required documents.');
+      return;
+    }
+
+    const submissionData = new FormData();
+    Object.entries(basicInfo).forEach(([key, value]) => {
+      submissionData.append(key, value);
+    });
+    submissionData.append('idFrontFile', idFrontFile);
+    submissionData.append('idBackFile', idBackFile);
+    additionalFiles.forEach((file) => {
+      submissionData.append('additionalFiles', file);
+    });
+
+    const hasActualFiles = (
+      submissionData.get('idFrontFile') instanceof File
+      && submissionData.get('idBackFile') instanceof File
+    );
+    if (!hasActualFiles) {
+      setMode('danger');
+      setVisible(true);
+      setMessage('The selected documents could not be prepared for submission.');
+      return;
+    }
+
+    setMode('success');
     setVisible(true)
     setMessage('Data has been submitted successfully.')
 
@@ -48,9 +81,7 @@ const Confirmation = () => {
       address: '',
       dob: '',
     }))
-    dispatch(setIdFrontFileInfo(null))
-    dispatch(setIdBackFileInfo(null))
-    dispatch(setAdditionalFilesInfo([]))
+    clearDocumentFiles()
   }
 
 
@@ -72,28 +103,27 @@ const Confirmation = () => {
         <div className="preview-section">
           <h3>Document Upload</h3>
           <p><strong>ID Card Front:</strong>
-            {documentUpload.idFrontFile ? (
+            {idFrontFile ? (
               <span id="preview-id-front">
-                {documentUpload.idFrontFile.name} ({formatFileSize(documentUpload.idFrontFile.size)})
+                {idFrontFile.name} ({formatFileSize(idFrontFile.size)})
               </span>
             ) : (
               <span>No file uploaded</span>
             )}</p>
           <p><strong>ID Card Back:</strong>
-            {documentUpload.idBackFile ? (
+            {idBackFile ? (
               <span id="preview-id-back">
-                {documentUpload.idBackFile.name} ({formatFileSize(documentUpload.idBackFile.size)})
+                {idBackFile.name} ({formatFileSize(idBackFile.size)})
               </span>
             ) : (
               <span>No file uploaded</span>
             )}
           </p>
           <p><strong>Additional Documents:</strong>
-            {/* <span id="preview-additional-docs"></span> */}
-            {documentUpload.additionalFiles && documentUpload.additionalFiles.length > 0 && (
+            {additionalFiles.length > 0 && (
               <div>
                 <ul>
-                  {documentUpload.additionalFiles.map((file, index) => (
+                  {additionalFiles.map((file, index) => (
                     <li key={index}>
                       {file.name} ({formatFileSize(file.size)})
                     </li>

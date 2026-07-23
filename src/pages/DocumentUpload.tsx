@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RootState } from '@/store/store'
-import { useDispatch, useSelector } from "react-redux";
-import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice";
 
 import FileUpload from "@/components/FileUpload";
 import MultiFileUpload from "@/components/MultiFileUpload";
 import Alert from '@/components/Alert';
+import useDocumentFiles from "@/hooks/useDocumentFiles";
 
 const documentMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 const documentAccept = documentMimeTypes.join(',');
@@ -15,43 +13,15 @@ const idDocumentMaxSizeMB = 2;
 const additionalDocumentMaxSizeMB = 10;
 
 const DocumentUpload = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const documentUpload = useSelector((state: RootState) => state.documentUpload);
-
-  // Keep files in local component state for preview and manipulation.
-  // Redux stores only serializable metadata (name/size/type) and is updated on Next/Back.
-
-
-  const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
-  const [idBackFile, setIdBackFile] = useState<File | null>(null);
-  const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
-
-  const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, type: string) => {
-    setFile(file);
-
-    if (!file) {
-      if (type === 'front') {
-        dispatch(setIdFrontFileInfo(null));
-      } else if (type === 'back') {
-        dispatch(setIdBackFileInfo(null));
-      }
-      return;
-    }
-
-    const errorKey = type === 'front' ? 'idFront' : 'idBack';
-    setErrors((previousErrors) => ({
-      ...previousErrors,
-      [errorKey]: undefined,
-    }));
-  };
-
-  const handleAdditionalFilesChange = (files: File[]) => {
-    setAdditionalDocuments(files);
-  };
-
-  // Preview handled inside FileUpload / MultiFileUpload components.
+  const {
+    idFrontFile,
+    setIdFrontFile,
+    idBackFile,
+    setIdBackFile,
+    additionalFiles,
+    setAdditionalFiles,
+  } = useDocumentFiles();
 
   const [visible, setVisible] = useState<boolean>(false)
   const [mode, setMode] = useState<'warning' | 'info' | 'success' | 'danger'>('warning')
@@ -63,31 +33,40 @@ const DocumentUpload = () => {
 
   const [errors, setErrors] = useState<Errors>({});
 
-
-  const hasFrontFile = !!idFrontFile || !!documentUpload.idFrontFile;
-  const hasBackFile = !!idBackFile || !!documentUpload.idBackFile;
-  const frontFileInfo = idFrontFile ? { name: idFrontFile.name, size: idFrontFile.size, type: idFrontFile.type } : documentUpload.idFrontFile;
-  const backFileInfo = idBackFile ? { name: idBackFile.name, size: idBackFile.size, type: idBackFile.type } : documentUpload.idBackFile;
-  const additionalFilesInfo = additionalDocuments.length > 0 ? additionalDocuments.map(file => ({ name: file.name, size: file.size, type: file.type })) : documentUpload.additionalFiles;
-
   const handleBack = () => {
-    dispatch(setIdFrontFileInfo(frontFileInfo));
-    dispatch(setIdBackFileInfo(backFileInfo));
-    dispatch(setAdditionalFilesInfo(additionalFilesInfo));
-
     navigate('/');
+  };
+
+  const handleIdFrontFileChange = (file: File | null) => {
+    setIdFrontFile(file);
+    if (file) {
+      setErrors((previousErrors) => ({
+        ...previousErrors,
+        idFront: undefined,
+      }));
+    }
+  };
+
+  const handleIdBackFileChange = (file: File | null) => {
+    setIdBackFile(file);
+    if (file) {
+      setErrors((previousErrors) => ({
+        ...previousErrors,
+        idBack: undefined,
+      }));
+    }
   };
 
   const handleNext = () => {
     const newErrors: Errors = {};
     let hasErrorsFlag = false;
 
-    if (!hasFrontFile) {
+    if (!idFrontFile) {
       newErrors.idFront = "ID Card Front is required";
       hasErrorsFlag = true;
     }
 
-    if (!hasBackFile) {
+    if (!idBackFile) {
       newErrors.idBack = "ID Card Back is required";
       hasErrorsFlag = true;
     }
@@ -100,10 +79,6 @@ const DocumentUpload = () => {
       setVisible(true);
       return;
     }
-
-    dispatch(setIdFrontFileInfo(frontFileInfo));
-    dispatch(setIdBackFileInfo(backFileInfo));
-    dispatch(setAdditionalFilesInfo(additionalFilesInfo));
 
     navigate('/confirmation');
   };
@@ -121,11 +96,11 @@ const DocumentUpload = () => {
           accept={documentAccept}
           acceptText={documentAcceptText}
           maxSizeMB={idDocumentMaxSizeMB}
-          onFileChange={(file) => handleFileChange(file, setIdFrontFile, 'front')}
+          file={idFrontFile}
+          onFileChange={handleIdFrontFileChange}
           preview={true}
           required={true}
           errorMessage={errors.idFront}
-          fileInfo={documentUpload.idFrontFile}
         />
         <FileUpload
           label="ID Card Back"
@@ -134,11 +109,11 @@ const DocumentUpload = () => {
           accept={documentAccept}
           acceptText={documentAcceptText}
           maxSizeMB={idDocumentMaxSizeMB}
-          onFileChange={(file) => handleFileChange(file, setIdBackFile, 'back')}
+          file={idBackFile}
+          onFileChange={handleIdBackFileChange}
           preview={true}
           required={true}
           errorMessage={errors.idBack}
-          fileInfo={documentUpload.idBackFile}
         />
 
         <MultiFileUpload
@@ -148,10 +123,10 @@ const DocumentUpload = () => {
           accept={documentAccept}
           acceptText={documentAcceptText}
           maxSizeMB={additionalDocumentMaxSizeMB}
-          onFileChange={handleAdditionalFilesChange}
+          files={additionalFiles}
+          onFileChange={setAdditionalFiles}
           preview={true}
           required={false}
-          filesInfo={documentUpload.additionalFiles}
         />
 
       </fieldset>

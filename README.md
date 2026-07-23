@@ -60,6 +60,7 @@
 | label | string | ✓ | 檔案上傳器的標籤文字 |
 | id | string | ✓ | 檔案上傳器的唯一識別碼 |
 | name | string | ✓ | 輸入框的 name 屬性 |
+| file | File \| null | ✓ | 當前選取的實際檔案 |
 | onFileChange | function | ✓ | 檔案選擇改變時呼叫的回調函式，參數為 File 或 null |
 | accept | string |  | 可接受的 MIME 檔案類型，如 'image/jpeg, image/png	,application/pdf' |
 | acceptText | string |  | 顯示給使用者的可接受檔案類型文字說明，如 '.jpg,.png,.pdf' |
@@ -67,14 +68,6 @@
 | preview | boolean |  | 是否顯示檔案預覽（圖片） |
 | required | boolean |  | 是否為必填欄位 |
 | errorMessage | string |  | 顯示的錯誤訊息 |
-| fileInfo | uploadFileInfo |   | 當前已上傳檔案的資訊 |
-
-uploadFileInfo   
-| 變數名稱 | 型別 | 必填 | 描述 |
-|:------:|:------:|:-----:|-----|
-| name | string | ✓ | 檔案名稱 |
-| size | number | ✓ | 檔案大小（單位：bytes） |
-| type | string | ✓ | 檔案的 MIME 類型 |
 
 #### MultiFileUpload
 ![image](https://github.com/user-attachments/assets/75462060-a40c-4489-afd6-86d7dac616eb)  
@@ -86,6 +79,7 @@ uploadFileInfo
 | label | string | ✓ | 檔案上傳器的標籤文字 |
 | id | string | ✓ | 檔案上傳器的唯一識別碼 |
 | name | string | ✓ | 輸入框的 name 屬性 |
+| files | File[] | ✓ | 當前選取的實際檔案陣列 |
 | onFileChange | function | ✓ | 檔案選擇改變時呼叫的回調函式，參數為 File 陣列 |
 | accept | string |  | 可接受的MIME檔案類型，如 'image/jpeg, image/png	,application/pdf' |
 | acceptText | string |  | 顯示給使用者的可接受檔案類型文字說明，如 '.jpg,.png,.pdf' |
@@ -93,14 +87,6 @@ uploadFileInfo
 | preview | boolean |  | 是否顯示檔案預覽 |
 | required | boolean |  | 是否為必填欄位 |
 | errorMessage | string |  | 顯示的錯誤訊息 |
-| filesInfo | uploadFileInfo[] |  | 當前已上傳檔案的資訊陣列 |
-
-uploadFileInfo   
-| 變數名稱 | 型別 | 必填 | 描述 |
-|:------:|:------:|:-----:|-----|
-| name | string | ✓ | 檔案名稱 |
-| size | number | ✓ | 檔案大小（單位：bytes） |
-| type | string | ✓ | 檔案的 MIME 類型 |
 
 #### Input
 ![image](https://github.com/user-attachments/assets/2f56e71a-b5e9-4ed4-9f88-760549cd3ad2)  

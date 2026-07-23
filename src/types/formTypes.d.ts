@@ -67,6 +67,7 @@ interface fileUploadProps {
   label: string;
   id: string;
   name: string;
+  file: File | null;
   onFileChange: (file: File | null) => void; 
   accept?: string;
   acceptText?: string;
@@ -74,12 +75,12 @@ interface fileUploadProps {
   preview?: boolean;
   required?: boolean;
   errorMessage?: string;
-  fileInfo?: uploadFileInfo | null;
 }
 interface mulitFileUploadProps {
   label: string;
   id: string;
   name: string;
+  files: File[];
   onFileChange: (files: File[]) => void;
   accept?: string;
   acceptText?: string;
@@ -87,7 +88,6 @@ interface mulitFileUploadProps {
   preview?: boolean;
   required?: boolean;
   errorMessage?: string;
-  filesInfo?: uploadFileInfo[]; 
 }
 
 interface formDataType {
@@ -117,16 +117,4 @@ interface Errors {
   address?: string;
   dob?: string;
   [key: string]: string | undefined; 
-}
-
-interface uploadFileInfo {
-  name: string;
-  size: number;
-  type: string;
-}
-
-interface DocumentUploadState {
-  idFrontFile: uploadFileInfo | null;
-  idBackFile: uploadFileInfo | null;
-  additionalFiles: uploadFileInfo[];
 }
