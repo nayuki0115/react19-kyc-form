@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setBasicInfoData } from '@/store/basicInfoSlice'; // 確保路徑正確
+import { setBasicInfoData } from '@/store/basicInfoSlice';
 
 import Alert from '@/components/Alert';
 import useDocumentFiles from "@/hooks/useDocumentFiles";

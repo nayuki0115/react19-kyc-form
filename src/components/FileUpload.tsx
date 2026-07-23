@@ -89,8 +89,8 @@ const FileUpload = ({ label, id, name, file, onFileChange, accept, acceptText, m
         accept={accept}
         required={required}
         ref={fileInputRef}
-        style={{ display: 'none' }} // 隱藏預設的 input
-        onChange={handleFileSelect} // 監聽預設輸入框的 change 事件
+        style={{ display: 'none' }}
+        onChange={handleFileSelect}
       />
       {file && (
         <div className="selected-files">

@@ -4,7 +4,7 @@ import basicInfoReducer from '@/store/basicInfoSlice';
 
 const store = configureStore({
   reducer: {
-    basicInfo: basicInfoReducer, // 將 basicInfo reducer 添加到 store
+    basicInfo: basicInfoReducer,
   },
 });
 

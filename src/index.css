@@ -3,10 +3,8 @@
   --success-color: #15803d;
   --neutral-color: #6b7280;
   --background-color: #f9fafb;
-  /* body背景色 */
   --text-color: #1f2a44;
   --fieldset-background: #fefefe;
-  /* fieldset專用背景色 */
   --step-width: 120px;
   --icon-size: 2.5rem;
   --gap: 120px;
@@ -327,7 +325,6 @@ h2 {
   background-color: #f8f8f8;
   cursor: pointer;
   margin-right: 10px;
-  /* 調整寬度 */
   width: 120px;
   text-align: center;
   color: black;
@@ -338,7 +335,7 @@ h2 {
 }
 
 .file-input {
-  display: none; /* 隱藏預設的 input[type=file] */
+  display: none;
 }
 
 .file-info {
@@ -360,7 +357,7 @@ h2 {
 }
 
 
-/* mulitFileUpload 樣式 */
+/* MultiFileUpload 樣式 */
 
 .selected-files {
   margin-top: 10px;

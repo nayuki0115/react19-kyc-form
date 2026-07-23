@@ -104,7 +104,6 @@ const BasicInfo = () => {
     }else {
       setVisible(false);
       setMessage('');
-      // validation passed -> save to redux and go to next step
       dispatch(setBasicInfoData(formData));
       navigate('/document-upload');
     }
