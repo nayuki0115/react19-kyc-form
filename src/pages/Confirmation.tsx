@@ -120,19 +120,18 @@ const Confirmation = () => {
               <span>No file uploaded</span>
             )}
           </p>
-          <p><strong>Additional Documents:</strong>
+          <div>
+            <strong>Additional Documents:</strong>
             {additionalFiles.length > 0 && (
-              <div>
-                <ul>
-                  {additionalFiles.map((file, index) => (
-                    <li key={index}>
-                      {file.name} ({formatFileSize(file.size)})
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul>
+                {additionalFiles.map((file, index) => (
+                  <li key={index}>
+                    {file.name} ({formatFileSize(file.size)})
+                  </li>
+                ))}
+              </ul>
             )}
-          </p>
+          </div>
         </div>
       </fieldset>
       <div className="form-actions">

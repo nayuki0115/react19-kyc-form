@@ -18,15 +18,15 @@ const MultiFileUpload = ({ label, id, name, files, onFileChange, accept, acceptT
   }, [files]);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files ?? []);
-    if (files.length === 0) {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    if (selectedFiles.length === 0) {
       return;
     }
 
     const validFiles: File[] = [];
     const validationErrors: string[] = [];
 
-    files.forEach((file) => {
+    selectedFiles.forEach((file) => {
       const validationError = validateUploadFile(file, {
         accept,
         acceptText,

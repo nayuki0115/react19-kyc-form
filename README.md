@@ -178,6 +178,13 @@ pnpm install
 pnpm run dev
 ```
 
+## 測試
+
+```bash
+pnpm run test
+pnpm run test:watch
+```
+
 ## 專案結構
 ```tree
 react19-kyc-form/
