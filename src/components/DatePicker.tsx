@@ -1,6 +1,7 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import type { DatePickerProps, ValidationHandle } from '@/types/formTypes';
 
-const DatePicker = forwardRef<validaHandle, datePickerProps>(({ label, id, name, required, value, onChange, errorMessage, validationRules = [], onValidationResult, ...rest }: datePickerProps, forwardedRef) => {
+const DatePicker = forwardRef<ValidationHandle, DatePickerProps>(({ label, id, name, required, value, onChange, errorMessage, validationRules = [], onValidationResult, ...rest }, forwardedRef) => {
   const [localErrorMessage, setLocalErrorMessage] = useState<string | undefined>(errorMessage);
 
   useEffect(() => {

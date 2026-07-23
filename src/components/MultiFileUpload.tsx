@@ -1,62 +1,55 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/Button";
+import { validateUploadFile } from "@/utils/fileValidation";
+import type { MultiFileUploadProps } from '@/types/formTypes';
 
-const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage, filesInfo }: mulitFileUploadProps) => {
+const MultiFileUpload = ({ label, id, name, files, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage }: MultiFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
+  // manage object URLs for previews
   useEffect(() => {
-    if (filesInfo) {
-      setSelectedFiles(filesInfo.map(info => new File([], info.name, { type: info.type })));
-    } else {
-      setSelectedFiles([]);
-    }
-  }, [filesInfo]);
-
-  // manage object URLs for previews for selected local files (not metadata-only files)
-  useEffect(() => {
-    // revoke previous urls
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
-    const urls = selectedFiles.map(file => (file && file.type.startsWith('image/') ? URL.createObjectURL(file) : ''));
+    const urls = files.map(file => (file.type.startsWith('image/') ? URL.createObjectURL(file) : ''));
     setPreviewUrls(urls);
     return () => {
       urls.forEach(url => { if (url) URL.revokeObjectURL(url); });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFiles]);
+  }, [files]);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const validFiles: File[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const validationError = validateFile(file);
-        if (!validationError) {
-          validFiles.push(file);
-        } else {
-          setError(validationError); // 顯示最後一個錯誤
-        }
-      }
-      setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
-      onFileChange([...selectedFiles, ...validFiles]); // 通知父組件
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      setError(null);
-    }
-  };
-  const validateFile = (file: File): string | null => {
-    if (accept && !accept.split(',').map((s) => s.trim()).includes(file.type)) {
-      return `File type "${file.name}" does not match. Only accepting: ${acceptText}`;
+    const selectedFiles = Array.from(event.target.files ?? []);
+    if (selectedFiles.length === 0) {
+      return;
     }
 
-    if (maxSizeMB && file.size > maxSizeMB * 1024 * 1024) {
-      return `File "${file.name}" size exceeds limit (${maxSizeMB} MB).`;
+    const validFiles: File[] = [];
+    const validationErrors: string[] = [];
+
+    selectedFiles.forEach((file) => {
+      const validationError = validateUploadFile(file, {
+        accept,
+        acceptText,
+        maxSizeMB,
+      });
+
+      if (validationError) {
+        validationErrors.push(validationError);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    setError(validationErrors.length > 0 ? validationErrors.join(' ') : null);
+
+    if (validFiles.length > 0) {
+      const nextFiles = [...files, ...validFiles];
+      onFileChange(nextFiles);
     }
-    return null;
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleChooseFileClick = () => {
@@ -64,8 +57,8 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
   };
 
   const handleRemoveFile = (indexToRemove: number) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
-    onFileChange(selectedFiles.filter((item, index) => index !== indexToRemove)); // 通知父組件
+    const nextFiles = files.filter((_, index) => index !== indexToRemove);
+    onFileChange(nextFiles);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -108,11 +101,11 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
       
 
 
-      {selectedFiles.length > 0 && (
+      {files.length > 0 && (
         <div className="selected-files">
           <label className="selected-files-label">Selected Files:</label>
           <ul>
-            {selectedFiles.map((file, index) => (
+            {files.map((file, index) => (
               <li key={index} className="selected-files-item">
                 <span className="selected-file-name">
                   {file.name} ({formatFileSize(file.size)})

@@ -1,5 +1,6 @@
-const Alert = ({ visible, mode, message, onClose, ...rest }: AlertType) => {
-  const alertMode = mode.toUpperCase();
+import type { AlertProps } from '@/types/formTypes';
+
+const Alert = ({ visible, mode, message, onClose }: AlertProps) => {
   const alertClass = `alert alert-${mode}`;
   const handleClose = () => {
     if (onClose) {

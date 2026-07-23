@@ -1,56 +1,28 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RootState } from '@/store/store'
-import { useDispatch, useSelector } from "react-redux";
-import { setIdFrontFileInfo, setIdBackFileInfo, setAdditionalFilesInfo } from "@/store/documentUploadSlice";
 
 import FileUpload from "@/components/FileUpload";
 import MultiFileUpload from "@/components/MultiFileUpload";
 import Alert from '@/components/Alert';
+import useDocumentFiles from "@/hooks/useDocumentFiles";
+import type { DocumentUploadErrors } from '@/types/formTypes';
+
+const documentMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+const documentAccept = documentMimeTypes.join(',');
+const documentAcceptText = '.jpg, .png, .pdf';
+const idDocumentMaxSizeMB = 2;
+const additionalDocumentMaxSizeMB = 10;
 
 const DocumentUpload = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const documentUpload = useSelector((state: RootState) => state.documentUpload);
-
-  // Keep files in local component state for preview and manipulation.
-  // Redux stores only serializable metadata (name/size/type) and is updated on Next/Back.
-
-
-  const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
-  const [idBackFile, setIdBackFile] = useState<File | null>(null);
-  const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
-
-
-  const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, type: string) => {
-    if (file) {
-      const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'application/pdf'];
-      const allowedTypesText = ".jpg,.png,.pdf";
-
-      if (allowedTypes.includes(file.type)) {
-        setFile(file);
-      } else {
-        setVisalbe(true);
-        setMessage(`File type not allowed. Please select ${allowedTypesText} file.`);
-        setFile(null);
-      }
-    } else {
-      // clearing local file selection; metadata will be cleared on Back/Next as needed
-      setFile(null);
-      if (type === 'front') {
-        dispatch(setIdFrontFileInfo(null));
-      } else if (type === 'back') {
-        dispatch(setIdBackFileInfo(null));
-      }
-    }
-  };
-
-  const handleAdditionalFilesChange = (files: File[]) => {
-    setAdditionalDocuments(files);
-  };
-
-  // Preview handled inside FileUpload / MultiFileUpload components.
+  const {
+    idFrontFile,
+    setIdFrontFile,
+    idBackFile,
+    setIdBackFile,
+    additionalFiles,
+    setAdditionalFiles,
+  } = useDocumentFiles();
 
   const [visible, setVisible] = useState<boolean>(false)
   const [mode, setMode] = useState<'warning' | 'info' | 'success' | 'danger'>('warning')
@@ -60,33 +32,42 @@ const DocumentUpload = () => {
     setMessage('')
   };
 
-  const [errors, setErrors] = useState<Errors>({});
-
-
-  const hasFrontFile = !!idFrontFile || !!documentUpload.idFrontFile;
-  const hasBackFile = !!idBackFile || !!documentUpload.idBackFile;
-  const frontFileInfo = idFrontFile ? { name: idFrontFile.name, size: idFrontFile.size, type: idFrontFile.type } : documentUpload.idFrontFile;
-  const backFileInfo = idBackFile ? { name: idBackFile.name, size: idBackFile.size, type: idBackFile.type } : documentUpload.idBackFile;
-  const additionalFilesInfo = additionalDocuments.length > 0 ? additionalDocuments.map(file => ({ name: file.name, size: file.size, type: file.type })) : documentUpload.additionalFiles;
+  const [errors, setErrors] = useState<DocumentUploadErrors>({});
 
   const handleBack = () => {
-    dispatch(setIdFrontFileInfo(frontFileInfo));
-    dispatch(setIdBackFileInfo(backFileInfo));
-    dispatch(setAdditionalFilesInfo(additionalFilesInfo));
-
     navigate('/');
   };
 
+  const handleIdFrontFileChange = (file: File | null) => {
+    setIdFrontFile(file);
+    if (file) {
+      setErrors((previousErrors) => ({
+        ...previousErrors,
+        idFront: undefined,
+      }));
+    }
+  };
+
+  const handleIdBackFileChange = (file: File | null) => {
+    setIdBackFile(file);
+    if (file) {
+      setErrors((previousErrors) => ({
+        ...previousErrors,
+        idBack: undefined,
+      }));
+    }
+  };
+
   const handleNext = () => {
-    const newErrors: Errors = {};
+    const newErrors: DocumentUploadErrors = {};
     let hasErrorsFlag = false;
 
-    if (!hasFrontFile) {
+    if (!idFrontFile) {
       newErrors.idFront = "ID Card Front is required";
       hasErrorsFlag = true;
     }
 
-    if (!hasBackFile) {
+    if (!idBackFile) {
       newErrors.idBack = "ID Card Back is required";
       hasErrorsFlag = true;
     }
@@ -96,13 +77,9 @@ const DocumentUpload = () => {
     if (hasErrorsFlag) {
       setMode('warning');
       setMessage('Please upload the required documents.');
-      setVisalbe(true);
+      setVisible(true);
       return;
     }
-
-    dispatch(setIdFrontFileInfo(frontFileInfo));
-    dispatch(setIdBackFileInfo(backFileInfo));
-    dispatch(setAdditionalFilesInfo(additionalFilesInfo));
 
     navigate('/confirmation');
   };
@@ -117,40 +94,40 @@ const DocumentUpload = () => {
           label="ID Card Front"
           id="id-front"
           name="id-front"
-          accept="image/jpeg, image/png	,application/pdf"
-          acceptText=".jpg,.png,.pdf"
-          maxSizeMB={2}
-          onFileChange={(file) => handleFileChange(file, setIdFrontFile, 'front')}
+          accept={documentAccept}
+          acceptText={documentAcceptText}
+          maxSizeMB={idDocumentMaxSizeMB}
+          file={idFrontFile}
+          onFileChange={handleIdFrontFileChange}
           preview={true}
           required={true}
           errorMessage={errors.idFront}
-          fileInfo={documentUpload.idFrontFile}
         />
         <FileUpload
           label="ID Card Back"
           id="id-back"
           name="id-back"
-          accept="image/jpeg, image/png	,application/pdf"
-          acceptText=".jpg,.png,.pdf"
-          maxSizeMB={2}
-          onFileChange={(file) => handleFileChange(file, setIdBackFile, 'back')}
+          accept={documentAccept}
+          acceptText={documentAcceptText}
+          maxSizeMB={idDocumentMaxSizeMB}
+          file={idBackFile}
+          onFileChange={handleIdBackFileChange}
           preview={true}
           required={true}
           errorMessage={errors.idBack}
-          fileInfo={documentUpload.idBackFile}
         />
 
         <MultiFileUpload
           label="Additional Documents"
           id="additional-docs"
           name="additional-docs"
-          accept="image/jpeg, image/png ,application/pdf"
-          acceptText=".jpg,.png,.pdf"
-          maxSizeMB={10}
-          onFileChange={handleAdditionalFilesChange}
+          accept={documentAccept}
+          acceptText={documentAcceptText}
+          maxSizeMB={additionalDocumentMaxSizeMB}
+          files={additionalFiles}
+          onFileChange={setAdditionalFiles}
           preview={true}
           required={false}
-          filesInfo={documentUpload.additionalFiles}
         />
 
       </fieldset>
