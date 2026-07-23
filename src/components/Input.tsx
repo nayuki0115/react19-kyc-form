@@ -1,44 +1,45 @@
-import React, { useImperativeHandle, useState, forwardRef, ChangeEvent, FocusEvent } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  type ChangeEvent,
+  type FocusEvent,
+} from "react";
 
-const Input = forwardRef<validaHandle, inputProps>(({ id, label, name, required, value, onChange, ...rest }, forwardedRef) => {
-  const { type } = rest
+const Input = forwardRef<validaHandle, inputProps>(({ id, label, name, required, value, onChange, onBlur, ...rest }, forwardedRef) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
 
-  const handleValidation = () => {
-    if (required && (!value || value.trim() === '')) {
+  const validate = (nextValue: string) => {
+    if (required && nextValue.trim() === '') {
       setErrorMessage(`${label} is required.`);
-      return false; 
+      return false;
     }
 
-    if (type === 'email' && value) {
+    if (rest.type === 'email' && nextValue) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value.trim())) {
+      if (!emailRegex.test(nextValue.trim())) {
         setErrorMessage(`Invalid email format.`);
-        return false; 
+        return false;
       }
     }
+
     setErrorMessage('');
     return true;
   };
 
-  const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    if (required) {
-      handleValidation();
-    }
+  const handleInputBlur = (event: FocusEvent<HTMLInputElement>) => {
+    onBlur?.(event);
+    validate(event.currentTarget.value);
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (onChange) {
-      onChange(event);
-    }
-    handleValidation();
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange?.(event);
+    validate(event.currentTarget.value);
   }
-
 
   useImperativeHandle(forwardedRef, () => ({
-    validation: handleValidation,
+    validation: () => validate(value),
   }));
-
 
   return (
     <div className="form-group">
