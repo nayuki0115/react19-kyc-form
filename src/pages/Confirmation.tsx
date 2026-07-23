@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { RootState, AppDispatch } from '@/store/store'
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setBasicInfoData } from '@/store/basicInfoSlice'; // 確保路徑正確
 
 import Alert from '@/components/Alert';
@@ -9,9 +8,9 @@ import { useState } from "react";
 
 const Confirmation = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
-  const basicInfo = useSelector((state: RootState) => state.basicInfo);
+  const basicInfo = useAppSelector((state) => state.basicInfo);
   const {
     idFrontFile,
     idBackFile,
@@ -49,7 +48,9 @@ const Confirmation = () => {
 
     const submissionData = new FormData();
     Object.entries(basicInfo).forEach(([key, value]) => {
-      submissionData.append(key, value);
+      if (value !== undefined) {
+        submissionData.append(key, value);
+      }
     });
     submissionData.append('idFrontFile', idFrontFile);
     submissionData.append('idBackFile', idBackFile);

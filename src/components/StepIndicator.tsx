@@ -1,4 +1,6 @@
-const  StepIndicator = ({currentStep, totalSteps, onStepClick}: stepIndicatorProps) => {
+import type { StepIndicatorProps } from '@/types/formTypes';
+
+const  StepIndicator = ({currentStep, totalSteps, onStepClick}: StepIndicatorProps) => {
   const getStepClassName = (index: number): string => {
     const baseClassName = 'step';
     const completedClassName = index + 1 < currentStep ? 'completed' : '';

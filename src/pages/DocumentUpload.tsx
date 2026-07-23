@@ -5,6 +5,7 @@ import FileUpload from "@/components/FileUpload";
 import MultiFileUpload from "@/components/MultiFileUpload";
 import Alert from '@/components/Alert';
 import useDocumentFiles from "@/hooks/useDocumentFiles";
+import type { DocumentUploadErrors } from '@/types/formTypes';
 
 const documentMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
 const documentAccept = documentMimeTypes.join(',');
@@ -31,7 +32,7 @@ const DocumentUpload = () => {
     setMessage('')
   };
 
-  const [errors, setErrors] = useState<Errors>({});
+  const [errors, setErrors] = useState<DocumentUploadErrors>({});
 
   const handleBack = () => {
     navigate('/');
@@ -58,7 +59,7 @@ const DocumentUpload = () => {
   };
 
   const handleNext = () => {
-    const newErrors: Errors = {};
+    const newErrors: DocumentUploadErrors = {};
     let hasErrorsFlag = false;
 
     if (!idFrontFile) {

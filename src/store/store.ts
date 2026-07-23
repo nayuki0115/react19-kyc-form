@@ -10,8 +10,5 @@ const store = configureStore({
 
 export default store;
 
-export interface RootState {
-  basicInfo: formDataType;
-}
-
+export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

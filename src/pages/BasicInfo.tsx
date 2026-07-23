@@ -1,8 +1,17 @@
-import React, { useState, useRef } from 'react';
+import {
+  useState,
+  useRef,
+  type ChangeEvent,
+  type RefObject,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setBasicInfoData } from '@/store/basicInfoSlice';
-import { RootState, AppDispatch } from '@/store/store'; 
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import type {
+  AlertMode,
+  BasicInfoFormData,
+  ValidationHandle,
+} from '@/types/formTypes';
 
 import Input from '@/components/Input';
 
@@ -17,13 +26,13 @@ import Alert from '@/components/Alert';
 
 const BasicInfo = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const basicInfo = useSelector((state: RootState) => state.basicInfo);
+  const dispatch = useAppDispatch();
+  const basicInfo = useAppSelector((state) => state.basicInfo);
 
-  const [formData, setFormData] = useState<formDataType>(basicInfo);
+  const [formData, setFormData] = useState<BasicInfoFormData>(basicInfo);
 
   const [visible, setVisible] = useState<boolean>(false)
-  const mode: AlertType['mode'] = 'warning'
+  const mode: AlertMode = 'warning'
   const [message, setMessage] = useState<string>('')
   const handleAlertClose = () => {
     setVisible(false)
@@ -55,29 +64,29 @@ const BasicInfo = () => {
     return undefined;
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setFormData((prevData) => ({ ...prevData, dob: value }));
   };
 
   
-  const nameRef = useRef<validaHandle>(null);
-  const emailRef = useRef<validaHandle>(null);
-  const phoneRef = useRef<validaHandle>(null);
-  const nationalityRef = useRef<validaHandle>(null);
-  const dobRef = useRef<validaHandle>(null);
+  const nameRef = useRef<ValidationHandle>(null);
+  const emailRef = useRef<ValidationHandle>(null);
+  const phoneRef = useRef<ValidationHandle>(null);
+  const nationalityRef = useRef<ValidationHandle>(null);
+  const dobRef = useRef<ValidationHandle>(null);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   }
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleNext = () => {
-    const requiredFields: React.RefObject<validaHandle | null>[] = [
+    const requiredFields: RefObject<ValidationHandle | null>[] = [
       nameRef,
       emailRef,
       phoneRef,

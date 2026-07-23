@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { BasicInfoFormData } from '@/types/formTypes';
 
 // 定義 state 的初始值
-const initialState: formDataType = {
+const initialState: BasicInfoFormData = {
   name: '',
   email: '',
   phone: '',
@@ -17,7 +18,7 @@ const basicInfoSlice = createSlice({
   initialState,
   reducers: {
     // 定義你的 reducers，它們會處理特定的 actions 並更新 state
-    setBasicInfoData: (state, action: PayloadAction<formDataType>) => {
+    setBasicInfoData: (state, action: PayloadAction<BasicInfoFormData>) => {
       state.name = action.payload.name;
       state.email = action.payload.email;
       state.phone = action.payload.phone;

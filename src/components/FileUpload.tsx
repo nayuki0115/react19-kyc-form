@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/Button";
 import { validateUploadFile } from "@/utils/fileValidation";
+import type { FileUploadProps } from '@/types/formTypes';
 
-const FileUpload = ({ label, id, name, file, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage }: fileUploadProps) => {
+const FileUpload = ({ label, id, name, file, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage }: FileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);

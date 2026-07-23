@@ -5,8 +5,9 @@ import {
   type ChangeEvent,
   type FocusEvent,
 } from "react";
+import type { SelectProps, ValidationHandle } from '@/types/formTypes';
 
-const Select = forwardRef<validaHandle, selectProps>(({ id, label, name, required, value, options, onChange, onBlur, ...rest }, forwardedRef) => {
+const Select = forwardRef<ValidationHandle, SelectProps>(({ id, label, name, required, value, options, onChange, onBlur, ...rest }, forwardedRef) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
 
   const validate = (nextValue: string) => {

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/Button";
 import { validateUploadFile } from "@/utils/fileValidation";
+import type { MultiFileUploadProps } from '@/types/formTypes';
 
-const MultiFileUpload = ({ label, id, name, files, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage }: mulitFileUploadProps) => {
+const MultiFileUpload = ({ label, id, name, files, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage }: MultiFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
