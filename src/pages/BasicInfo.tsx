@@ -138,10 +138,10 @@ const BasicInfo = () => {
 
     let alertFlag = errors.some(item => item === false)
     if(alertFlag) {
-      setVisalbe(true)
+      setVisible(true)
       setMessage('Please enter the required fields')
     }else {
-      setVisalbe(false);
+      setVisible(false);
       setMessage('');
       // validation passed -> save to redux and go to next step
       dispatch(setBasicInfoData(formData));

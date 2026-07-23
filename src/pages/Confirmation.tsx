@@ -36,7 +36,7 @@ const Confirmation = () => {
   };
 
   const handleSubmit = () => {
-    setVisalbe(true)
+    setVisible(true)
     setMessage('Data has been submitted successfully.')
 
     dispatch(setBasicInfoData({

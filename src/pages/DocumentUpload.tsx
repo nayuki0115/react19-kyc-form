@@ -31,7 +31,7 @@ const DocumentUpload = () => {
       if (allowedTypes.includes(file.type)) {
         setFile(file);
       } else {
-        setVisalbe(true);
+        setVisible(true);
         setMessage(`File type not allowed. Please select ${allowedTypesText} file.`);
         setFile(null);
       }
@@ -96,7 +96,7 @@ const DocumentUpload = () => {
     if (hasErrorsFlag) {
       setMode('warning');
       setMessage('Please upload the required documents.');
-      setVisalbe(true);
+      setVisible(true);
       return;
     }
 
