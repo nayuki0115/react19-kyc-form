@@ -1,5 +1,6 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/Button";
+import { validateUploadFile } from "@/utils/fileValidation";
 
 const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage, filesInfo }: mulitFileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,35 +29,39 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
   }, [selectedFiles]);
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const validFiles: File[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const validationError = validateFile(file);
-        if (!validationError) {
-          validFiles.push(file);
-        } else {
-          setError(validationError); // 顯示最後一個錯誤
-        }
-      }
-      setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
-      onFileChange([...selectedFiles, ...validFiles]); // 通知父組件
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      setError(null);
-    }
-  };
-  const validateFile = (file: File): string | null => {
-    if (accept && !accept.split(',').map((s) => s.trim()).includes(file.type)) {
-      return `File type "${file.name}" does not match. Only accepting: ${acceptText}`;
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      return;
     }
 
-    if (maxSizeMB && file.size > maxSizeMB * 1024 * 1024) {
-      return `File "${file.name}" size exceeds limit (${maxSizeMB} MB).`;
+    const validFiles: File[] = [];
+    const validationErrors: string[] = [];
+
+    files.forEach((file) => {
+      const validationError = validateUploadFile(file, {
+        accept,
+        acceptText,
+        maxSizeMB,
+      });
+
+      if (validationError) {
+        validationErrors.push(validationError);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    setError(validationErrors.length > 0 ? validationErrors.join(' ') : null);
+
+    if (validFiles.length > 0) {
+      const nextFiles = [...selectedFiles, ...validFiles];
+      setSelectedFiles(nextFiles);
+      onFileChange(nextFiles);
     }
-    return null;
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleChooseFileClick = () => {
@@ -64,8 +69,9 @@ const MultiFileUpload = ({ label, id, name, onFileChange, accept, acceptText, ma
   };
 
   const handleRemoveFile = (indexToRemove: number) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
-    onFileChange(selectedFiles.filter((item, index) => index !== indexToRemove)); // 通知父組件
+    const nextFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    setSelectedFiles(nextFiles);
+    onFileChange(nextFiles);
   };
 
   const formatFileSize = (bytes: number): string => {

@@ -8,6 +8,12 @@ import FileUpload from "@/components/FileUpload";
 import MultiFileUpload from "@/components/MultiFileUpload";
 import Alert from '@/components/Alert';
 
+const documentMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+const documentAccept = documentMimeTypes.join(',');
+const documentAcceptText = '.jpg, .png, .pdf';
+const idDocumentMaxSizeMB = 2;
+const additionalDocumentMaxSizeMB = 10;
+
 const DocumentUpload = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,28 +28,23 @@ const DocumentUpload = () => {
   const [idBackFile, setIdBackFile] = useState<File | null>(null);
   const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
 
-
   const handleFileChange = (file: File | null, setFile: React.Dispatch<React.SetStateAction<File | null>>, type: string) => {
-    if (file) {
-      const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'application/pdf'];
-      const allowedTypesText = ".jpg,.png,.pdf";
+    setFile(file);
 
-      if (allowedTypes.includes(file.type)) {
-        setFile(file);
-      } else {
-        setVisible(true);
-        setMessage(`File type not allowed. Please select ${allowedTypesText} file.`);
-        setFile(null);
-      }
-    } else {
-      // clearing local file selection; metadata will be cleared on Back/Next as needed
-      setFile(null);
+    if (!file) {
       if (type === 'front') {
         dispatch(setIdFrontFileInfo(null));
       } else if (type === 'back') {
         dispatch(setIdBackFileInfo(null));
       }
+      return;
     }
+
+    const errorKey = type === 'front' ? 'idFront' : 'idBack';
+    setErrors((previousErrors) => ({
+      ...previousErrors,
+      [errorKey]: undefined,
+    }));
   };
 
   const handleAdditionalFilesChange = (files: File[]) => {
@@ -117,9 +118,9 @@ const DocumentUpload = () => {
           label="ID Card Front"
           id="id-front"
           name="id-front"
-          accept="image/jpeg, image/png	,application/pdf"
-          acceptText=".jpg,.png,.pdf"
-          maxSizeMB={2}
+          accept={documentAccept}
+          acceptText={documentAcceptText}
+          maxSizeMB={idDocumentMaxSizeMB}
           onFileChange={(file) => handleFileChange(file, setIdFrontFile, 'front')}
           preview={true}
           required={true}
@@ -130,9 +131,9 @@ const DocumentUpload = () => {
           label="ID Card Back"
           id="id-back"
           name="id-back"
-          accept="image/jpeg, image/png	,application/pdf"
-          acceptText=".jpg,.png,.pdf"
-          maxSizeMB={2}
+          accept={documentAccept}
+          acceptText={documentAcceptText}
+          maxSizeMB={idDocumentMaxSizeMB}
           onFileChange={(file) => handleFileChange(file, setIdBackFile, 'back')}
           preview={true}
           required={true}
@@ -144,9 +145,9 @@ const DocumentUpload = () => {
           label="Additional Documents"
           id="additional-docs"
           name="additional-docs"
-          accept="image/jpeg, image/png ,application/pdf"
-          acceptText=".jpg,.png,.pdf"
-          maxSizeMB={10}
+          accept={documentAccept}
+          acceptText={documentAcceptText}
+          maxSizeMB={additionalDocumentMaxSizeMB}
           onFileChange={handleAdditionalFilesChange}
           preview={true}
           required={false}

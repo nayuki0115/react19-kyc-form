@@ -1,6 +1,6 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Button from "@/components/Button";
-
+import { validateUploadFile } from "@/utils/fileValidation";
 
 const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSizeMB, preview, required, errorMessage, fileInfo }: fileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -8,34 +8,38 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const clearSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onFileChange(null);
+  };
+
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (file) {
-      setSelectedFile(file);
+    if (!file) {
       setError(null);
-      validateFile(file);
-      onFileChange(file);
-    } else {
-      setSelectedFile(null);
-      onFileChange(null);
-    }
-  };
-
-  const validateFile = (file: File) => {
-    if (accept && !accept.split(',').map(s => s.trim()).includes(file.type)) {
-      setError(`File type does not match. Only accepting: ${acceptText}`);
-      setSelectedFile(null);
-      onFileChange(null);
+      clearSelectedFile();
       return;
     }
 
-    if (maxSizeMB && file.size > maxSizeMB * 1024 * 1024) {
-      setError(`File size exceeds limit (${maxSizeMB} MB).`);
-      setSelectedFile(null);
-      onFileChange(null);
+    const validationError = validateUploadFile(file, {
+      accept,
+      acceptText,
+      maxSizeMB,
+    });
+
+    if (validationError) {
+      setError(validationError);
+      clearSelectedFile();
       return;
     }
+
+    setSelectedFile(file);
+    setError(null);
+    onFileChange(file);
   };
 
   const handleChooseFileClick = () => {
@@ -68,8 +72,8 @@ const FileUpload = ({ label, id, name, onFileChange, accept, acceptText, maxSize
   }, [selectedFile]);
 
   const handleDeleteFile = () => {
-    setSelectedFile(null);
-    onFileChange(null)
+    setError(null);
+    clearSelectedFile();
   }
 
   return (
